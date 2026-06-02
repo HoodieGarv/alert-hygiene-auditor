@@ -1,0 +1,48 @@
+services:
+
+  # Prometheus is a time-series database and monitoring system that scrapes
+  # metrics from configured targets and evaluates alert rules against those
+  # metrics. It is the primary data source for the auditor's noise and drift
+  # analyses.
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  # Alertmanager receives alerts from Prometheus, handles deduplication,
+  # grouping, and routing, and exposes a REST API that this auditor will query
+  # for historical alert data. The /api/v2/alerts endpoint is the primary
+  # source of firing-event records used to classify alert hygiene.
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "9093:9093"
+
+  # Node Exporter exposes real hardware and OS metrics from the host machine,
+  # giving Prometheus realistic data to evaluate alert rules against. Without
+  # a real metrics source the alert rules would never fire and there would be
+  # no history for the auditor to analyse.
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+
+  # PostgreSQL stores the normalised alert history that the analysis engine
+  # queries. SQLite was considered but rejected because PostgreSQL's window
+  # functions and date arithmetic are necessary for the trend detection
+  # algorithms (e.g. LAG/LEAD for firing-rate slope, DATE_TRUNC for bucketing).
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: auditor
+      POSTGRES_USER: auditor
+      POSTGRES_PASSWORD: auditor_dev_only
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

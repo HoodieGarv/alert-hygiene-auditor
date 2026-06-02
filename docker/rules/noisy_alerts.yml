@@ -1,0 +1,78 @@
+# Intentionally misconfigured alert rules for auditor development and testing.
+#
+# These rules are designed to generate the three alert hygiene failure modes
+# that the auditor is built to detect:
+#
+#   1. Chronic noise — HighCPU, LowMemory, and NetworkLatency use thresholds
+#      so sensitive that they fire continuously on any real machine, simulating
+#      rules that have never been calibrated against actual operating baselines.
+#
+#   2. Co-firing clusters — DiskPressure and SlowDiskIO evaluate different
+#      metrics but will always fire together on a machine with any disk
+#      activity, simulating rules that share an upstream cause and should be
+#      consolidated into a single higher-fidelity alert.
+#
+#   3. Threshold drift — to be simulated via Prometheus recording rules in a
+#      later phase; the rules here provide the historical baseline against
+#      which drift will be measured.
+
+groups:
+  - name: noisy_alerts
+    rules:
+
+      # Fires when CPU idle drops below 95%, meaning the alert triggers at
+      # just 5% CPU utilisation. Any non-idle machine will fire this constantly.
+      - alert: HighCPU
+        expr: avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100 < 95
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU idle is below 95% — threshold is intentionally miscalibrated."
+
+      # Fires when available memory is below 80% of total. On a machine using
+      # more than 20% of RAM (effectively all machines), this fires constantly.
+      - alert: LowMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low memory available"
+          description: "Available memory is below 80% — threshold is intentionally miscalibrated."
+
+      # Fires when disk usage exceeds 20%. Co-fires with SlowDiskIO intentionally
+      # to simulate a co-firing cluster sharing a common upstream cause.
+      - alert: DiskPressure
+        expr: (1 - node_filesystem_free_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 > 20
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk usage above 20%"
+          description: "Disk utilisation has exceeded 20% — threshold is intentionally low."
+
+      # Fires whenever any network bytes have been received, which is always
+      # true on a connected machine. Simulates a broken rule whose expression
+      # is always non-zero regardless of actual system health.
+      - alert: NetworkLatency
+        expr: node_network_receive_bytes_total > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Network latency detected"
+          description: "Metric is always above 0 — this rule is intentionally broken."
+
+      # Fires whenever there is any disk I/O, co-firing with DiskPressure
+      # intentionally to form a two-alert cluster the auditor should flag
+      # as a consolidation candidate.
+      - alert: SlowDiskIO
+        expr: rate(node_disk_io_time_seconds_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow disk I/O detected"
+          description: "Any disk I/O satisfies this expression — co-fires with DiskPressure intentionally."

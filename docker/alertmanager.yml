@@ -1,0 +1,13 @@
+# This config intentionally routes all alerts to a null receiver so that
+# alerts accumulate in Alertmanager's history and remain queryable via the
+# REST API without sending actual notifications to any external system.
+# This is the correct behaviour for a development stack whose purpose is
+# to generate alert history for the auditor to analyse.
+
+route:
+  receiver: null-receiver
+  group_wait: 10s
+
+receivers:
+  - name: null-receiver
+    webhook_configs: []

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the full repository so subsequent steps have access to the
+      # source code, pyproject.toml, and test files.
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Set up the exact Python version declared in pyproject.toml
+      # (requires-python = ">=3.11").  Pinning to 3.11 rather than "latest"
+      # prevents silent breakage when a new Python release ships a behavior
+      # change that the project has not yet been tested against.
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Install the package itself plus all dev-group dependencies in a single
+      # pip call.  The editable flag (-e) puts src/auditor directly on
+      # sys.path without a build step, which keeps CI startup time low and
+      # ensures import paths match what developers see locally.
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      # Run ruff to enforce lint rules across the entire codebase.  Ruff
+      # consolidates flake8, pyupgrade, and isort into one fast pass.  Any
+      # violation exits non-zero and fails the build, keeping a consistent
+      # quality baseline across all contributors without requiring them to
+      # install and configure multiple tools locally.
+      - name: Lint with ruff
+        run: ruff check .
+
+      # Run black in --check mode rather than write mode.  In write mode,
+      # black would reformat files and commit the changes back to the branch,
+      # which creates machine-authored commits that add noise to git history,
+      # can trigger unnecessary merge conflicts when two pull requests touch
+      # the same file, and may produce changes the author has not reviewed.
+      # In --check mode black exits non-zero when any file would be reformatted,
+      # failing the build and prompting the developer to run `black .` locally
+      # before pushing.
+      - name: Check formatting with black
+        run: black --check .
+
+      # Run the full test suite with verbose output so that failing test names
+      # and their assertion errors are visible at a glance in the CI log.
+      # --tb=short prints the most relevant traceback lines without the full
+      # stack, keeping the log readable.  Coverage is measured against the
+      # src/auditor package and reported inline so the percentage is visible
+      # in the job summary without requiring a separate coverage service.
+      - name: Run tests with pytest
+        run: pytest -v --tb=short --cov=src/auditor --cov-report=term-missing

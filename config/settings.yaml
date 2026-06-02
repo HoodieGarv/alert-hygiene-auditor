@@ -1,0 +1,8 @@
+# Local development configuration.
+# Values here are overridden by environment variables of the same name (uppercased).
+# Do not commit secrets — use a .env file or export variables in your shell instead.
+
+PROMETHEUS_URL: http://localhost:9090
+ALERTMANAGER_URL: http://localhost:9093
+DATABASE_URL: postgresql://auditor:auditor_dev_only@localhost:5432/auditor
+LOOKBACK_DAYS: 30
