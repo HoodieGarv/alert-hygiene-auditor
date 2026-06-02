@@ -87,21 +87,33 @@ def run_ingestion() -> None:
                 run_start - timedelta(days=settings.lookback_days)
             )
 
-        logger.info("Starting ingestion run — window: %s → %s", since.isoformat(), run_start.isoformat())
+        logger.info(
+            "Starting ingestion run — window: %s → %s",
+            since.isoformat(),
+            run_start.isoformat(),
+        )
 
         # --- Prometheus --------------------------------------------------
         with PrometheusClient(settings.prometheus_url) as prom:
             raw_series = prom.fetch_alert_history(start=since, end=run_start)
         records_fetched += len(raw_series)
         prom_rows = normalize_prometheus_series(raw_series)
-        logger.debug("Prometheus: %d series → %d AlertFiring rows", len(raw_series), len(prom_rows))
+        logger.debug(
+            "Prometheus: %d series → %d AlertFiring rows",
+            len(raw_series),
+            len(prom_rows),
+        )
 
         # --- Alertmanager ------------------------------------------------
         with AlertmanagerClient(settings.alertmanager_url) as am:
             raw_alerts = am.fetch_alerts()
         records_fetched += len(raw_alerts)
         am_rows = normalize_alertmanager_alerts(raw_alerts)
-        logger.debug("Alertmanager: %d alerts → %d AlertFiring rows", len(raw_alerts), len(am_rows))
+        logger.debug(
+            "Alertmanager: %d alerts → %d AlertFiring rows",
+            len(raw_alerts),
+            len(am_rows),
+        )
 
         all_rows = prom_rows + am_rows
 

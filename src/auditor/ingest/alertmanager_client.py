@@ -76,8 +76,8 @@ class AlertmanagerClient:
         response = self._client.get(
             "/api/v2/alerts",
             params={
-                "active":    str(active).lower(),
-                "silenced":  str(silenced).lower(),
+                "active": str(active).lower(),
+                "silenced": str(silenced).lower(),
                 "inhibited": str(inhibited).lower(),
             },
         )

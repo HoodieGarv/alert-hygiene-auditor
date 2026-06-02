@@ -20,13 +20,16 @@ Test cases
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
 
-from auditor.analysis.schemas import AlertHygieneIssue, AnalysisReport, IssueType, Severity
+from auditor.analysis.schemas import (
+    AlertHygieneIssue,
+    AnalysisReport,
+    IssueType,
+    Severity,
+)
 from auditor.recommendations.exporters import markdown_exporter
 from auditor.recommendations.generator import RecommendationGenerator
 from auditor.recommendations.schemas import Priority
-
 
 # ---------------------------------------------------------------------------
 # Helpers

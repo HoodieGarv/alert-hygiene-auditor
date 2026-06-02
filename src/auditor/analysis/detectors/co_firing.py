@@ -11,7 +11,6 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from itertools import combinations
-from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -103,9 +102,8 @@ class CoFiringDetector:
         # Fetch the minimal columns needed: alert name and start timestamp.
         # Fetching full rows (including JSON labels) would transfer unnecessary
         # data for what is fundamentally a grouping operation.
-        stmt = (
-            select(AlertFiring.alert_name, AlertFiring.starts_at)
-            .where(AlertFiring.starts_at >= since)
+        stmt = select(AlertFiring.alert_name, AlertFiring.starts_at).where(
+            AlertFiring.starts_at >= since
         )
         rows = session.execute(stmt).all()
 

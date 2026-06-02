@@ -122,7 +122,11 @@ def export(
     for i, rec in enumerate(recommendations, start=1):
         findings_sections.append(_render_recommendation(i, rec))
 
-    findings = "## Findings\n\n" + "\n---\n\n".join(findings_sections) if findings_sections else ""
+    findings = (
+        "## Findings\n\n" + "\n---\n\n".join(findings_sections)
+        if findings_sections
+        else ""
+    )
 
     # --- Assemble and write ---------------------------------------------
     parts = [header, "---", summary]

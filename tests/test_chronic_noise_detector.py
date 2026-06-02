@@ -63,7 +63,9 @@ def session():
     sess.close()
 
 
-def _firing(alert_name: str, state: str = "firing", offset_hours: int = 0) -> AlertFiring:
+def _firing(
+    alert_name: str, state: str = "firing", offset_hours: int = 0
+) -> AlertFiring:
     """Build one AlertFiring row with minimal required fields populated."""
     return AlertFiring(
         alert_name=alert_name,

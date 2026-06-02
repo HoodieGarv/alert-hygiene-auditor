@@ -77,14 +77,16 @@ def test_two_alerts_that_always_co_fire_produce_one_finding(session: object) -> 
     for i in range(10):
         incident_start = BASE_TIME + timedelta(hours=i * 2)
         session.add(_firing("DiskPressure", incident_start + timedelta(seconds=30)))
-        session.add(_firing("SlowDiskIO",  incident_start + timedelta(seconds=90)))
+        session.add(_firing("SlowDiskIO", incident_start + timedelta(seconds=90)))
     session.commit()
 
-    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(session, SINCE)
+    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(
+        session, SINCE
+    )
 
     assert len(issues) == 1
     assert "DiskPressure" in issues[0].alert_name
-    assert "SlowDiskIO"   in issues[0].alert_name
+    assert "SlowDiskIO" in issues[0].alert_name
     assert issues[0].evidence["co_occurrence_ratio"] >= 0.70
 
 
@@ -100,7 +102,9 @@ def test_two_alerts_that_never_co_fire_produce_no_findings(session: object) -> N
         session.add(_firing("AlertB", BASE_TIME + timedelta(hours=i * 12 + 6)))
     session.commit()
 
-    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(session, SINCE)
+    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(
+        session, SINCE
+    )
 
     assert issues == []
 
@@ -122,7 +126,9 @@ def test_only_correlated_pair_is_flagged_among_three_alerts(session: object) -> 
         session.add(_firing("AlertC", incident_time + timedelta(hours=2)))
     session.commit()
 
-    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(session, SINCE)
+    issues = CoFiringDetector(window_minutes=5, co_fire_threshold=0.70).detect(
+        session, SINCE
+    )
 
     assert len(issues) == 1
     assert "AlertA" in issues[0].alert_name

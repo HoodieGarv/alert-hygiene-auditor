@@ -15,7 +15,6 @@ from pydantic import BaseModel, field_validator
 
 from auditor.db.models import AlertFiring
 
-
 # ---------------------------------------------------------------------------
 # Intermediate Pydantic schemas
 # ---------------------------------------------------------------------------

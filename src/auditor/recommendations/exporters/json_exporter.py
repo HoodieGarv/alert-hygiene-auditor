@@ -54,10 +54,7 @@ def export(
     payload: dict = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "count": len(recommendations),
-        "recommendations": [
-            rec.model_dump()
-            for rec in recommendations
-        ],
+        "recommendations": [rec.model_dump() for rec in recommendations],
     }
 
     with path.open("w", encoding="utf-8") as fh:

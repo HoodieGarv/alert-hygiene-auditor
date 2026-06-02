@@ -46,9 +46,7 @@ class _YamlSource(PydanticBaseSettingsSource):
         except FileNotFoundError:
             return {}
 
-    def get_field_value(
-        self, field: Any, field_name: str
-    ) -> tuple[Any, str, bool]:
+    def get_field_value(self, field: Any, field_name: str) -> tuple[Any, str, bool]:
         data = self._load()
         # Accept the field name in both lowercase and uppercase so that the
         # YAML file can use either convention.

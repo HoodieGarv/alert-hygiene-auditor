@@ -11,7 +11,6 @@ Either way, the alert is consuming on-call attention without providing signal.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
 
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
@@ -96,22 +95,24 @@ class ChronicNoiseDetector:
                 # state.  Prometheus records a "resolved" state transition when
                 # the PromQL expression evaluates to empty for a full evaluation
                 # cycle; Alertmanager records it when endsAt is in the past.
-                func.sum(
-                    case((AlertFiring.state == "resolved", 1), else_=0)
-                ).label("resolved_count"),
+                func.sum(case((AlertFiring.state == "resolved", 1), else_=0)).label(
+                    "resolved_count"
+                ),
             )
             .where(
                 # Restrict to the configured lookback window only.  Without this
                 # filter the query would scan the full table and weight old alerts
                 # equally with recent ones, producing stale findings.
-                AlertFiring.starts_at >= since
+                AlertFiring.starts_at
+                >= since
             )
             .group_by(AlertFiring.alert_name)
             .having(
                 # Apply the frequency threshold in SQL so that only candidate
                 # alerts are transferred to Python.  Alerts below the threshold
                 # cannot satisfy the full criteria and are cheaply excluded here.
-                func.count() > self._firing_threshold
+                func.count()
+                > self._firing_threshold
             )
         )
 

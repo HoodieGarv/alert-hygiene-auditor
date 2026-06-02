@@ -11,7 +11,6 @@ threshold and the actual system baseline is widening.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -185,9 +184,7 @@ class ThresholdDriftDetector:
                     severity=_severity(run, slice_count),
                     evidence={
                         "slice_counts": counts,
-                        "slice_labels": [
-                            s.isoformat() for s, _ in slices
-                        ],
+                        "slice_labels": [s.isoformat() for s, _ in slices],
                         "longest_increasing_run": run,
                         "total_slices": slice_count,
                         "slice_days": self._slice_days,
