@@ -1,0 +1,42 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+../.venv/
+venv/
+env/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Environment variables
+.env
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated reports
+reports/
+
+# Persisted ML model artifacts
+models/
+
+# Linter / type-checker caches
+.mypy_cache/
+.ruff_cache/
+
+# Secrets directory (never committed)
+secrets/
+
+# Editor swap files
+*.swp
+*.swo
+
+# OS
+.DS_Store
