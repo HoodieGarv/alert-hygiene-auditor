@@ -2,7 +2,7 @@
 
 Analyze Prometheus alert history to find the rules that should be rewritten — not silenced.
 
-[![CI](https://github.com/HoodieGarv/alert-hygiene-auditor/actions/workflows/ci.yml/badge.svg)](https://github.com/garvinstewart/alert-hygiene-auditor/actions/workflows/ci.yml)
+[![CI](https://github.com/HoodieGarv/alert-hygiene-auditor/actions/workflows/ci.yml/badge.svg)](https://github.com/HoodieGarv/alert-hygiene-auditor/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
