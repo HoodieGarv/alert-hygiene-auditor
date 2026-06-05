@@ -52,6 +52,19 @@ graph LR
 
 ---
 
+## Dashboard
+
+**Severity Overview**
+![Traffic-light severity chart showing alert counts by severity tier](docs/screenshots/severity_chart.png)
+
+**Findings Table**
+![Filterable findings table with sortable columns for rule, severity, and count](docs/screenshots/findings_table.png)
+
+**Recommendation Detail**
+![Detail panel showing remediation steps for a selected finding](docs/screenshots/recommendation_detail.png)
+
+---
+
 ## Design Decisions
 
 **PostgreSQL over SQLite for production.** The co-firing detector requires counting co-occurrences across pairs of alerts, and the threshold drift detector requires ordered aggregation over time slices. Both queries use window-function patterns that SQLite handles only partially. PostgreSQL's `LATERAL` join, partial index support, and reliable `TIMESTAMP WITH TIME ZONE` semantics make it the correct choice for a tool intended to query months of alert history. SQLite is used exclusively in the test suite, where the queries are simple enough for it to be correct and where eliminating an external dependency is worth the trade-off.
@@ -168,13 +181,9 @@ The suite uses SQLite in-memory databases throughout — no running services req
 
 ---
 
-## What This Project Demonstrates
+## Documentation
 
-**Systems thinking applied to observability.** The project models an entire data pipeline — from raw HTTP responses through normalization, storage, statistical analysis, and human-readable output — as a composition of small, independently testable layers. The architecture reflects the real constraints of production alerting: incremental ingestion to handle partial failures, deduplication at the storage layer to survive re-runs, and audit trails that persist even when the main data pass errors.
-
-**Python backend engineering at production quality.** The codebase uses SQLAlchemy 2.0's `Mapped`/`mapped_column` style, Pydantic v2 models with explicit validators, `pydantic-settings` for YAML configuration with environment variable overrides, `httpx` with context-managed session lifecycles, and SQLAlchemy Core expressions for aggregation queries rather than raw SQL strings. Every public class and function is documented, every module has a docstring, and the CI pipeline enforces both `ruff` lint rules and `black` formatting on every pull request.
-
-**Operational domain knowledge.** The three detector designs — ratio-based noise, time-bucket co-occurrence, and monotonic drift — reflect how experienced SREs actually reason about alert quality. The recommendation priority scheme (chronic noise is always `IMMEDIATE` because alert fatigue compounds; threshold drift is `SHORT_TERM` because the rule is still meaningful) reflects the same kind of operational judgment. The project is built around a real problem that affects real teams, not a contrived portfolio exercise.
+- [Architecture Decisions](docs/architecture-decisions.md)
 
 ---
 
